@@ -2,6 +2,18 @@ local addonName, addonTable = ...
 local Utils = addonTable.Utils
 local L = addonTable.L or {}
 local Registry = {}
+local function IsSecret(v)
+  return type(issecretvalue) == "function" and issecretvalue(v)
+end
+
+local function InInstance()
+  local inInstance = IsInInstance()
+  return inInstance
+end
+
+local function CommAllowed()
+  return not InInstance()
+end
 addonTable.Registry = Registry
 
 Registry.PREFIX = "FW"
@@ -25,6 +37,7 @@ end
 --- Sends a HELLO message containing the local version.
 -- @param target string (optional) The target player to respond to.
 function Registry:SendHello(target)
+    if not CommAllowed() then return end
     local version = self:GetLocalVersion()
     local msg = self.EVENT_HELLO .. ":" .. version
     if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
@@ -40,6 +53,7 @@ end
 --- Sends a QUERY message to request version information.
 -- @param target string (optional) The target player for the query.
 function Registry:SendQuery(target)
+    if not CommAllowed() then return end
     local msg = self.EVENT_QUERY
     if target and target ~= "" then
         -- Send a targeted query as a whisper
@@ -121,6 +135,7 @@ end
 --- Initiates fetching of the user list from the designated channel.
 -- Calls ListChannelByName to trigger the CHAT_MSG_CHANNEL_LIST event and retries until successful.
 function Registry:FetchUsers()
+    if not CommAllowed() then return end
     -- Purge entries that haven't been seen in a while before we refresh.
     self:CleanupUsers(self.USER_EXPIRATION)
     if self.usersFetched and not self.fetchingUsers then return end
@@ -163,6 +178,7 @@ channelListFrame:SetScript("OnEvent", function(_, event, ...)
     
     local players = select(playersIndex, ...)
     local channelName = select(channelIndex, ...)
+    if IsSecret(players) or IsSecret(channelName) then return end
     
     if channelName ~= Registry.CHANNEL_NAME then
         return
