@@ -2,7 +2,7 @@
 ## Title: FleshWound
 ## Notes: Adds a custom health UI for roleplay purposes
 ## Author: ElRapt
-## Version: 0.3.6
+## Version: 0.3.8
 ## SavedVariables: FleshWoundData
 ## IconTexture: Interface\Icons\INV_Misc_Bandage_01
 ## Category-enUS: Roleplay
